@@ -1,0 +1,581 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Narad Travels - Premium Pilgrimage Packages</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-brand" onclick="app.setView('home')">
+        <svg class="mountain-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M8 3l4 8 5-5 5 15H2L8 3z"></path>
+        </svg>
+        <span>NARAD<span class="text-orange">TRAVELS</span></span>
+      </div>
+      
+      <div class="navbar-menu">
+        <button class="nav-link" onclick="app.setView('home')">Home</button>
+        <button class="nav-link" onclick="app.setView('tours')">Packages</button>
+        <button class="nav-link" onclick="app.setView('about')">About Us</button>
+        <button id="admin-btn" class="nav-link admin-btn" style="display:none;" onclick="app.setView('admin')">Admin Dashboard</button>
+      </div>
+
+      <button class="menu-toggle" id="menu-toggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Hero Section -->
+    <div id="hero" class="hero">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <h1>Begin Your Spiritual <span class="text-orange">Himalayan Journey</span></h1>
+        <p>Divine Travel Experiences and Himalayan Treks Crafted for Every Pilgrim.</p>
+        <div class="hero-buttons">
+          <button class="btn btn-orange" onclick="app.setView('tours')">
+            Explore Packages
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <button class="btn btn-white" id="plan-trip-btn">Plan My Trip</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div id="features" class="features">
+      <div class="container">
+        <h2>Why Choose Us?</h2>
+        <p class="subtitle">We ensure your spiritual journey is comfortable and safe.</p>
+        <div class="features-grid">
+          <div class="feature-card">
+            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <h3>Safety First</h3>
+            <p>Certified guides and oxygen backup on high altitude treks.</p>
+          </div>
+          <div class="feature-card">
+            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <h3>Best Locations</h3>
+            <p>Premium hotels and camps near the temples.</p>
+          </div>
+          <div class="feature-card">
+            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <h3>Small Groups</h3>
+            <p>Personalized attention with limited group sizes.</p>
+          </div>
+          <div class="feature-card">
+            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="1"></circle>
+              <circle cx="19" cy="12" r="1"></circle>
+              <circle cx="5" cy="12" r="1"></circle>
+              <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"></path>
+            </svg>
+            <h3>Flexible Dates</h3>
+            <p>Choose from our fixed departures or customize your own.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--  Packages Section (Home) -->
+    <div id="featured-section" class="featured-section">
+      <div class="container">
+        <h2>Packages</h2>
+        <div id="featured-grid" class="tours-grid"></div>
+        <div class="text-center" style="margin-top: 3rem;">
+          <button class="view-all-link" onclick="app.setView('tours')">View All Packages →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats & Reviews Section -->
+    <div id="stats-reviews-section" class="stats-reviews-section">
+      <!-- Stats Banner -->
+      <div class="stats-banner">
+        <div class="stats-overlay"></div>
+        <div class="container">
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-number" data-target="2400">0</div>
+              <div class="stat-label">Happy Pilgrims</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" data-target="98">0</div>
+              <div class="stat-label stat-percent">%</div>
+              <div class="stat-label-sub">Customer Satisfaction</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" data-target="125">0</div>
+              <div class="stat-label">Tours Organized</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" data-target="15">0</div>
+              <div class="stat-label">Years Experience</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Testimonials Section -->
+      <div class="testimonials-section">
+        <div class="container">
+          <h3 class="testimonials-heading">Testimonials</h3>
+          
+          <div class="review-badges">
+            <div class="badge">
+              <svg viewBox="0 0 100 33" height="40"><text x="50" y="22" text-anchor="middle" fill="#4285F4" font-size="20" font-weight="bold">Google</text></svg>
+            </div>
+            <div class="badge">
+              <svg viewBox="0 0 100 33" height="40"><circ cx="20" cy="16" r="8" fill="#34A853"/><text x="50" y="20" text-anchor="middle" fill="#34A853" font-size="14" font-weight="bold">TripAdvisor</text></svg>
+            </div>
+          </div>
+
+          <div class="testimonials-carousel">
+            <div class="testimonials-track" id="testimonials-track">
+              <div class="testimonial-card">
+                <div class="testimonial-header">
+                  <img src="https://i.pravatar.cc/80?img=1" alt="Sunil" class="testimonial-avatar">
+                  <div class="testimonial-badge">64</div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">From start to finish, they were extremely professional, friendly, helpful and easy to do business with. Very happy with the experience and the company.</p>
+                <div class="testimonial-author">Sunil Rewatkar</div>
+              </div>
+
+              <div class="testimonial-card">
+                <div class="testimonial-header">
+                  <img src="https://i.pravatar.cc/80?img=2" alt="Anand" class="testimonial-avatar">
+                  <div class="testimonial-badge">84</div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">Amazing team! smiling, always nice to talk with, they always have the best advices for you, adapted to your needs!</p>
+                <div class="testimonial-author">Anand Nadkarni</div>
+                <div class="testimonial-trip">Customer: Kedarnath Trip</div>
+              </div>
+
+              <div class="testimonial-card">
+                <div class="testimonial-header">
+                  <img src="https://i.pravatar.cc/80?img=3" alt="Shobha" class="testimonial-avatar">
+                  <div class="testimonial-badge">72</div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">Positive energy, great team spirit, hard workers and awesome people! I warmly recommend them!</p>
+                <div class="testimonial-author">Shobha Shenoy</div>
+                <div class="testimonial-trip">Customer: Chardham Trip</div>
+              </div>
+
+              <div class="testimonial-card">
+                <div class="testimonial-header">
+                  <img src="https://i.pravatar.cc/80?img=4" alt="Madhuri" class="testimonial-avatar">
+                  <div class="testimonial-badge">91</div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">Exceptional service and attention to detail. Every moment of our trip was perfectly planned and executed. Highly satisfied!</p>
+                <div class="testimonial-author">Madhuri Desai</div>
+                <div class="testimonial-trip">Customer: Valley Trek</div>
+              </div>
+
+              <div class="testimonial-card">
+                <div class="testimonial-header">
+                  <img src="https://i.pravatar.cc/80?img=5" alt="Arjun" class="testimonial-avatar">
+                  <div class="testimonial-badge">88</div>
+                </div>
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">Best pilgrimage experience ever! The guides were knowledgeable, the stays were comfortable, and everything was well organized.</p>
+                <div class="testimonial-author">Arjun Mehta</div>
+                <div class="testimonial-trip">Customer: Badrinath Trip</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tours Section -->
+    <div id="tours-section" class="tours-section" style="display:none;">
+      <div class="container">
+        <h2>All Packages</h2>
+        <div id="tours-grid" class="tours-grid"></div>
+      </div>
+    </div>
+
+    <!-- Tour Detail -->
+    <div id="tour-detail" class="tour-detail" style="display:none;">
+      <div class="container">
+        <div id="detail-loading" class="loading-spinner" style="display:none;">
+          <div class="spinner"></div>
+          <p>Loading tour details...</p>
+        </div>
+        <button class="back-btn" onclick="app.setView('tours')" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          Back to Packages
+        </button>
+        <div class="detail-grid" style="display:none;">
+          <div class="detail-left">
+            <div class="detail-image-wrapper">
+              <img id="detail-image" src="" alt="Tour" class="detail-image">
+            </div>
+            <div class="detail-header">
+              <h1 id="detail-title"></h1>
+              <span id="detail-difficulty" class="difficulty-badge"></span>
+            </div>
+            <div class="detail-tabs">
+              <button class="tab-btn active" data-tab="itinerary">Itinerary</button>
+              <button class="tab-btn" data-tab="inclusions">Inclusions</button>
+              <button class="tab-btn" data-tab="map">Map</button>
+            </div>
+            <div id="detail-content" class="detail-content"></div>
+          </div>
+          <div class="detail-right">
+            <div class="booking-card">
+              <p class="price-label">Package Cost</p>
+              <p class="price" id="detail-price"></p>
+              <button class="btn btn-orange full-width" onclick="app.openBookingModal()">Book Now</button>
+              <button class="btn btn-outlined full-width">Download PDF Brochure</button>
+              <div class="contact-info">
+                <div class="contact-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                  </svg>
+                  +91 72488 43190
+                </div>
+                <div class="contact-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                  </svg>
+                  bookings@naradjiyatra.com
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- About Section -->
+    <div id="about-section" class="about-section" style="display:none;">
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-content">
+            <h1>About Naradji Yatra</h1>
+            <p class="about-text">
+              Since 2022, we have been organizing well planned and secure journeys to Kedarnath, helping pilgrims experience the divine in the heart of the Himalayas. Our focus is on comfort, safety, and a smooth travel experience so you can concentrate fully on your spiritual journey.
+            </p>
+
+            <p class="about-text">
+              With a team of experienced guides and local support staff, we ensure reliable assistance at every step from travel arrangements to on ground coordination making your Kedarnath Yatra peaceful, memorable, and hassle free.
+            </p>
+
+            <p class="about-text">
+              We stand out for our personalized approach, transparent pricing, and commitment to quality service. Every journey is carefully designed to match the needs of our travelers, ensuring a perfect balance of spirituality, comfort, and convenience.
+            </p>
+          </div>
+          
+          <div class="about-image">
+            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3" alt="Himalayan Mountains" class="about-img">
+            <div class="about-image-overlay"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Team Section -->
+    <div id="team-section" class="team-section" style="display:none;">
+      <div class="container">
+        <h2>Our Team</h2>
+        <p class="team-text">A dedicated group of experienced guides, logistics experts, and local support staff ensuring your pilgrimage is safe, comfortable, and inspired.</p>
+        <div class="team-grid">
+          <div class="team-card">
+            <img src="/images/shankar.jpg" alt="Guide" class="team-image">
+            <h3>Shankar Anil</h3>
+            <p>Team Member</p>
+          </div>
+          <div class="team-card">
+            <img src="/images/mayank.png" alt="Coordinator" class="team-image">
+            <h3>Mayank Kumar</h3>
+            <p>Team Member</p>
+          </div>
+          <div class="team-card">
+            <img src="/images/divya.jpg" alt="Support" class="team-image">
+            <h3>Divya Mishra</h3>
+            <p>Team Member</p>
+          </div>
+          <div class="team-card">
+            <img src="/images/wilson.png" alt="Support" class="team-image">
+            <h3>Wilson Singh</h3>
+            <p>Team Member</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Admin Dashboard -->
+    <div id="admin-section" class="admin-section" style="display:none;">
+      <div class="container">
+        <h1>Admin Dashboard</h1>
+        <p id="admin-user-id" class="user-id">Current User ID: <span>Authenticating...</span></p>
+        
+        <div class="admin-tabs">
+          <button class="admin-tab-btn active" data-tab="bookings">Bookings</button>
+          <button class="admin-tab-btn" data-tab="tours">Manage Tours</button>
+        </div>
+
+        <div id="bookings-tab" class="admin-tab-content" style="display:block;">
+          <div class="bookings-table-wrapper">
+            <table class="bookings-table">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Tour</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="bookings-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tours-tab" class="admin-tab-content" style="display:none;">
+          <div id="admin-tours-grid" class="admin-tours-grid"></div>
+          <div class="note">* The tours shown above are fetched from or seeded into Firestore.</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-section">
+        <h3>NARADJIYATRA</h3>
+        <p>Embark on a sacred journey to Kedarnath with confidence and ease. We bring together spiritual fulfillment and well organized travel, ensuring a safe, comfortable, and truly enriching Himalayan experience.
+</p>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#" onclick="app.setView('about'); return false;">About Us</a></li>
+          <li><a href="#" onclick="app.setView('tours'); return false;">Packages</a></li>
+          <li><a href="#" onclick="app.setView('home'); return false;">Home</a></li>
+          <li><a href="#" onclick="app.setView('tours'); return false;">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Contact Info</h4>
+        <div class="contact-list">
+          <div class="contact-item-footer">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.65 3 4.19c0 9.33 7.48 16.81 16.81 16.81c.54 0 1.19-.65 1.19-1.19v-3.19c0-.54-.45-.99-.99-.99z"/>
+            </svg>
+            +91 72488 43190
+          </div>
+          <div class="contact-item-footer">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            </svg>
+            bookings@naradjiyatra.com
+          </div>
+          <div class="contact-item-footer">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+            </svg>
+            Rishikesh, Uttarakhand
+          </div>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h4>Follow Us</h4>
+        <div class="social-icons">
+          <a href="#" class="social-icon instagram" title="Instagram">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.266.069 1.646.069 4.85 0 3.204-.012 3.584-.07 4.85-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1 1 12.324 0 6.162 6.162 0 0 1-12.324 0zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm4.965-10.322a1.44 1.44 0 1 1 2.881.001 1.44 1.44 0 0 1-2.881-.001z"/>
+            </svg>
+          </a>
+          <a href="#" class="social-icon facebook" title="Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+          </a>
+          <a href="#" class="social-icon twitter" title="Twitter / X">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.6l-5.1-6.65-5.867 6.65h-3.38l7.73-8.835L2.428 2.25h6.7l4.622 6.062L18.244 2.25zM17.51 19.77h1.833L5.75 4.155H3.75l13.76 15.615z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 NaradjiYatra. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- Booking Modal -->
+  <div id="booking-modal" class="modal" style="display:none;">
+    <div class="modal-overlay" onclick="app.closeBookingModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title">Book Tour</h2>
+        <button class="modal-close" onclick="app.closeBookingModal()">×</button>
+      </div>
+      <form id="booking-form" class="booking-form">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="date">Travel Date</label>
+            <input type="date" id="date" required>
+          </div>
+          <div class="form-group">
+            <label for="travelers">Travelers</label>
+            <input type="number" id="travelers" min="1" value="1" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="message">Special Requests</label>
+          <textarea id="message" rows="4"></textarea>
+        </div>
+        <div class="cost-summary">
+          <span>Total Estimated Cost:</span>
+          <span id="total-cost">₹0</span>
+        </div>
+        <button type="submit" class="btn btn-dark full-width">Confirm Booking</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Alert/Toast -->
+  <div id="alert" class="alert" style="display:none;"></div>
+
+  <!-- Plan Trip Modal -->
+  <dialog id="plan-trip-modal" class="plan-trip-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Plan Your Trip</h2>
+        <button class="modal-close" id="close-plan-modal">&times;</button>
+      </div>
+      <form id="plan-trip-form" class="plan-trip-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="trip-name">Full Name *</label>
+            <input type="text" id="trip-name" required>
+          </div>
+          <div class="form-group">
+            <label for="trip-email">Email *</label>
+            <input type="email" id="trip-email" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="trip-phone">Phone *</label>
+            <input type="tel" id="trip-phone" required>
+          </div>
+          <div class="form-group">
+            <label for="trip-destination">Destination</label>
+            <select id="trip-destination">
+              <option value="">Select Destination</option>
+              <option value="Kedarnath">Kedarnath</option>
+              <option value="Badrinath">Badrinath</option>
+              <option value="Gangotri">Gangotri</option>
+              <option value="Yamunotri">Yamunotri</option>
+              <option value="Chardham">Chardham Yatra</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="trip-date">Preferred Travel Date</label>
+            <input type="date" id="trip-date">
+          </div>
+          <div class="form-group">
+            <label for="trip-travelers">Number of Travelers</label>
+            <input type="number" id="trip-travelers" min="1" value="1">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="trip-message">Special Requirements or Message</label>
+          <textarea id="trip-message" rows="4" placeholder="Tell us about your preferences, accommodation requirements, or any special needs..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-orange full-width">Send via WhatsApp</button>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Floating Contact Widget -->
+  <div class="floating-contact-widget">
+    <div class="floating-contact-content">
+      <div class="contact-header">
+        <h4>Connect With Us</h4>
+        <p>Get in touch for your pilgrimage</p>
+      </div>
+      
+      <div class="contact-buttons">
+        <a href="tel:+917248843190" class="contact-btn call-btn" title="Call Us">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.65 3 4.19c0 9.33 7.48 16.81 16.81 16.81c.54 0 1.19-.65 1.19-1.19v-3.19c0-.54-.45-.99-.99-.99z"/>
+          </svg>
+          Call
+        </a>
+        
+        <a href="https://wa.me/917248843190" target="_blank" rel="noopener noreferrer" class="contact-btn whatsapp-btn" title="WhatsApp Us">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.383 0 0 5.383 0 12c0 2.191.558 4.322 1.612 6.207L0 24l6.294-1.612C10.322 23.441 11.161 24 12 24c6.617 0 12-5.383 12-12S18.617 0 12 0zm6.866 17.602c-.305.808-1.414 1.515-2.38 1.718-.613.132-1.413.232-4.135-.889-3.582-1.447-5.897-5.273-6.078-5.518-.181-.246-1.481-1.972-1.481-3.762 0-1.789.933-2.671 1.262-3.037.33-.367.72-.458.96-.458.239 0 .479 0 .689.01.221.012.519-.084.812.619.305.734 1.035 2.524 1.127 2.706.09.182.151.395.03.643-.121.248-.181.403-.362.62-.181.217-.381.482-.544.644-.181.181-.37.377-.159.734.211.357 1.129 1.863 2.42 3.021 1.664 1.486 3.07 1.944 3.427 2.165.356.221.563.19.768-.113.205-.303 1.059-1.313 1.339-1.759.28-.446.56-.373.934-.223.375.151 2.38 1.124 2.79 1.327.41.204.682.304.782.472.1.169.1.973-.205 1.782z"/>
+          </svg>
+          WhatsApp
+        </a>
+      </div>
+    </div>
+    
+    <button class="floating-toggle-btn" id="floating-toggle" title="Contact Us">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+      </svg>
+    </button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
